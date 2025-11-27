@@ -1,7 +1,7 @@
-import { useAchievements } from "@/components/achievements/AchievementsContext";
-import CollectionCheckboxes from "@/components/achievements/CollectionCheckboxes";
+import { useAchievements } from "@/games/halo-mcc/achievements/AchievementsContext";
+import CollectionCheckboxes from "@/games/halo-mcc/achievements/CollectionCheckboxes";
 import Icon from "@/components/Icon";
-import GameCheckboxes from "@/components/achievements/GameCheckboxes";
+import GameCheckboxes from "@/games/halo-mcc/achievements/GameCheckboxes";
 import useCachedToggle from "@/hooks/useCachedToggle";
 import { useLogin } from "@/hooks/LoginContext";
 

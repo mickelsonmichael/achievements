@@ -15,6 +15,7 @@ const LoginContext = createContext({
   isLoading: false,
   isLoggedIn: false,
   isLoggedInWithXbox: false,
+  steamId: null as string | null,
   achievements: [] as UserAchievement[],
   logout: () => {},
 });
@@ -70,7 +71,7 @@ const LoginProvider = ({ children }: LoginProviderProps) => {
   };
 
   return (
-    <LoginContext.Provider value={{ isLoggedIn, isLoggedInWithXbox, isLoading, logout, achievements }}>
+    <LoginContext.Provider value={{ isLoggedIn, isLoggedInWithXbox, isLoading, logout, achievements, steamId }}>
       {children}
     </LoginContext.Provider>
   );

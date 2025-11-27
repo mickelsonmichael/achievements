@@ -1,5 +1,5 @@
-import { useAchievements } from "@/components/achievements/AchievementsContext";
-import Icon from "./Icon";
+import { useAchievements } from "@/games/halo-mcc/achievements/AchievementsContext";
+import Icon from "../../components/Icon";
 
 const Unmatched = () => {
   const { unfilteredAchievements, userAchievements } = useAchievements();

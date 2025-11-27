@@ -1,7 +1,7 @@
 import { useLogin } from "@/hooks/LoginContext";
 import AchievementWithProgress from "@/models/AchievementWithProgress";
-import ProgressBar from "../ProgressBar";
-import Icon from "../Icon";
+import ProgressBar from "@/components/ProgressBar";
+import Icon from "../../../components/Icon";
 
 const AchievementsTableRow = ({
   achievement,

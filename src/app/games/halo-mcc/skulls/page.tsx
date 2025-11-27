@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 
-const ClientOnly = dynamic(() => import("@/components/skulls"), { ssr: false });
+const ClientOnly = dynamic(() => import("@/games/halo-mcc/skulls"), { ssr: false });
 
 const SkullsPage = () => <ClientOnly />;
 

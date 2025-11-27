@@ -21,12 +21,13 @@ const NavLink = ({
   ...props
 }: NavLinkProps) => {
   const pathName = usePathname();
-  const isActive = useMemo(() => pathName.startsWith(to), [pathName, to]);
+  const isActive = useMemo(() => pathName === to, [pathName, to]);
 
   const calculatedClassName = className ?? `
     flex
     items-center
     px-3
+    py-2
     ${isActive ? "bg-slate-400/20 rounded-sm" : ""}
   `
 

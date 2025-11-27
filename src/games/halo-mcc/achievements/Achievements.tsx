@@ -1,8 +1,8 @@
-import Filters from "@/components/achievements/Filters";
+import Filters from "@/games/halo-mcc/achievements/Filters";
 import { AchievementsProvider } from "./AchievementsContext";
-import AchievementsTable from "@/components/achievements/AchievementsTable";
-import Search from "@/components/achievements/Search";
-import Unmatched from "@/components/Unmatched";
+import AchievementsTable from "@/games/halo-mcc/achievements/AchievementsTable";
+import Search from "@/games/halo-mcc/achievements/Search";
+import Unmatched from "@/games/halo-mcc/Unmatched";
 
 const Achievements = () => (
   <AchievementsProvider>

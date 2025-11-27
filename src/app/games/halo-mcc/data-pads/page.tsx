@@ -1,4 +1,4 @@
-import DataPads from "@/components/data-pads";
+import DataPads from "@/games/halo-mcc/data-pads";
 
 const DataPadsPage = () => <DataPads />;
 

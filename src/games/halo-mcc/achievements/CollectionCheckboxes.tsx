@@ -1,5 +1,5 @@
-import { useAchievements } from "@/components/achievements/AchievementsContext";
-import ToggleButton from "../ToggleButton";
+import { useAchievements } from "@/games/halo-mcc/achievements/AchievementsContext";
+import ToggleButton from "@/components/ToggleButton";
 
 const CollectionCheckboxes = () => {
   const {

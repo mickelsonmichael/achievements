@@ -1,6 +1,6 @@
-import { useAchievements } from "@/components/achievements/AchievementsContext";
+import { useAchievements } from "@/games/halo-mcc/achievements/AchievementsContext";
 import Game from "@/models/Game";
-import ToggleButton from "../ToggleButton";
+import ToggleButton from "@/components/ToggleButton";
 
 const GameCheckboxes = () => {
   const { games, toggleGame, focusGame, enableAllGames, disableAllGames } =

@@ -9,15 +9,20 @@ import LoginButton from "@/components/LoginButton";
 import { useLogin } from "@/hooks/LoginContext";
 
 const Navigation = () => {
+  const { isOn: appDrawerOpen, toggle: toggleAppDrawer } = useToggle();
   const { isOn: menuOpen, toggle: toggleMenu } = useToggle();
   const { isLoading } = useLogin();
 
   return (
-    <div className="mb-4">
-      <div className="flex flex-col md:flex-row py-4 bg-white/5">
-        <header className="flex mb-2 pl-4 pr-4 md:mb-auto md:pr-8">
+    <div className="mb-4 relative">
+      <div className="flex flex-col px-2 md:flex-row py-4 bg-white/5">
+        <header className="flex items-center">
+          <div className={`mx-3 p-1 flex items-center cursor-pointer rounded ${appDrawerOpen ? "bg-white/10": ""}`} onClick={toggleAppDrawer}>
+            <Icon name="grid" size={2} />
+          </div>
+
           <Link href="/">
-            <h1 className="text-xl">Halo MCC Collectibles</h1>
+            <h1 className="text-xl">Achivement Tracker</h1>
           </Link>
 
           <div className="ml-auto md:hidden">
@@ -48,21 +53,7 @@ const Navigation = () => {
             ${menuOpen ? "flex" : "hidden"}
         `}
         >
-          <ul className="flex gap-1 flex-col md:flex-row">
-            <NavLink icon="award" to="/achievements">
-              Achievements
-            </NavLink>
-            <NavLink icon="dribbble" to="/skulls">
-              Skulls
-            </NavLink>
-            <NavLink icon="monitor" to="/terminals">
-              Terminals
-            </NavLink>
-            <NavLink icon="smartphone" to="/data-pads">
-              Data Pads
-            </NavLink>
-          </ul>
-          <ul className="flex flex-col gap-1 md:flex-row md:ml-auto">
+          <ul className="flex flex-col gap-1 items-center md:flex-row md:ml-auto">
             <LoginButton />
 
             <NavLink
@@ -81,6 +72,18 @@ const Navigation = () => {
           Loading achievements
         </div>
       )}
+      <div className={`absolute ${appDrawerOpen ? 'flex' : 'hidden'} content-center top-[120%] left-5 right-5`}>
+        <div className="bg-indigo-900/95 p-3 w-full rounded">
+          <ul>
+            <li>
+              <a href="/games/halo-mcc">Halo: Master Chief Collection</a>
+            </li>
+            <li>
+              <a href="/games/spell-brigade">The Spell Brigade</a>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { useAchievements } from "@/components/achievements/AchievementsContext";
+import { useAchievements } from "@/games/halo-mcc/achievements/AchievementsContext";
 import { useLogin } from "@/hooks/LoginContext";
 import AchievementsTableRow from "./AchievementsTableRow";
 

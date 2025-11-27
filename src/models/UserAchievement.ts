@@ -1,5 +1,6 @@
 interface UserAchievement {
     name: string;
+    description?: string;
     unlockedTimestamp: number | null;
     progress: null | boolean | {
         target: number;

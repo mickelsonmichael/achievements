@@ -73,14 +73,14 @@ const LoginButton = () => {
 
             <div className="grid grid-cols-1 gap-2 border-t-1 pt-4 mt-2 md:grid-cols-2">
               <Link
-                href="api/auth/xbox"
+                href="/api/auth/xbox"
                 className="flex flex-row items-center bg-green-800 rounded-sm py-2 px-2 justify-center"
               >
                 <Icon name="xbox" className="mr-2" size={2} />
                 Sign in with Xbox
               </Link>
               <Link
-                href="api/auth"
+                href="/api/auth"
                 className="flex flex-row items-center bg-slate-950 rounded-sm py-2 px-2 justify-center"
               >
                 <Icon name="steam" className="mr-2" size={2} />

@@ -14,6 +14,7 @@ type GetAchievementsResponse = {
 
 const toUserAchievement = (achievement: SteamAchievement): UserAchievement => ({
     name: achievement.name ?? achievement.apiname,
+    description: achievement.description ?? "",
     unlockedTimestamp: achievement.unlocktime !== 0 ? achievement.unlocktime : null,
     progress: null
 });
@@ -36,10 +37,10 @@ const fromXboxAchievement = (achievement: XboxAchievement): UserAchievement => {
     });
 };
 
-const fetchSteamAchievements = async (steamId: string) => {
+const fetchSteamAchievements = async (steamId: string, gameId: string) => {
     console.log("Fetching achievements for ", steamId);
 
-    const url = `http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=976730&key=${process.env.STEAM_API_KEY}&steamid=${steamId}&l=en-US`;
+    const url = `http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${gameId}&key=${process.env.STEAM_API_KEY}&steamid=${steamId}&l=en-US`;
 
     const response = await fetch(url, {
         cache: "force-cache",
@@ -105,11 +106,15 @@ export const GET = async (request: NextRequest): Promise<NextResponse<GetAchieve
     const appKeyCookie = request.cookies.get("APP_KEY");
 
     if (xuidCookie && appKeyCookie) {
+        // Xbox authentication is always for Halo MCC
         return fetchXboxAchievements(xuidCookie.value, appKeyCookie.value);
     }
 
+
     if (steamIdCookie) {
-        return fetchSteamAchievements(steamIdCookie.value);
+        const gameId = request.nextUrl.searchParams.get("gameId") || "976730"; // default to Halo: MCC
+
+        return fetchSteamAchievements(steamIdCookie.value, gameId);
     }
 
     console.debug("User not authenticated, returning default list of achievements");

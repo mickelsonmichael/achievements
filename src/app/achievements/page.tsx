@@ -1,7 +1,3 @@
-"use client";
-
-import Achievements from "@/components/achievements";
-
-const AchievementsPage = () => <Achievements />;
+const AchievementsPage = () => <div>Achievements</div>;
 
 export default AchievementsPage;

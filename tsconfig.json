@@ -34,6 +34,9 @@
       ],
       "@hooks/*": [
         "./src/hooks/*"
+      ],
+      "@games/*": [
+        "./src/games/*"
       ]
     }
   },

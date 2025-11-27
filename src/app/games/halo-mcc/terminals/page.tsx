@@ -1,4 +1,4 @@
-import Terminals from "@/components/terminals";
+import Terminals from "@/games/halo-mcc/terminals";
 
 const TerminalsPage = () => <Terminals />;
 
