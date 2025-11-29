@@ -1,10 +1,10 @@
 "use client";
 
-import AchivementsLayout from "@/app/games/halo-mcc/layout";
 import { useLogin } from "@/hooks/LoginContext";
 import useAchievements from "@/hooks/useAchievements";
+import Info from "@/components/Info";
 import HeroAchievements from "./HeroAchivements";
-import Icon from "@/components/Icon";
+import SpellBrigadeAchievementList from "./SpellBrigadeAchievementList";
 
 const getHeroName = (description?: string) => {
   if (!description || !description.startsWith("As ")) return null;
@@ -20,7 +20,7 @@ const getHeroName = (description?: string) => {
 };
 
 const SpellBrigade = () => {
-  const { steamId } = useLogin();
+  const { steamId, isLoggedInWithXbox, isLoggedIn } = useLogin();
   const { achievements } = useAchievements(steamId, "2904000");
 
   const heroes = achievements
@@ -41,27 +41,29 @@ const SpellBrigade = () => {
     return a.name.localeCompare(b.name);
   });
 
+  if (!isLoggedIn || isLoggedInWithXbox) {
+    return (
+      <Info icon="alert-circle">
+        You must be logged in with Steam to track <em>The Spell Brigade</em>{" "}
+        achievements.
+      </Info>
+    );
+  }
+
   return (
     <div>
-      <div className="grid grid-cols-2">
+      <div className="grid md:grid-cols-2">
         {Object.keys(heroes).map((hero) => (
-          <HeroAchievements hero={hero} achievements={heroes[hero]} />
+          <HeroAchievements
+            key={hero}
+            hero={hero}
+            achievements={heroes[hero]}
+          />
         ))}
       </div>
 
-      <div className="table">
-        {sortedAchievements.map((a) => (
-          <div key={a.name} className="table-row">
-            <div className="table-cell py-1 px-2">
-              <Icon
-                name={a.unlockedTimestamp ? "check" : "lock"}
-                className="inline mr-2"
-              />
-            </div>
-            <div className="table-cell py-1 px-2">{a.name}</div>
-            <div className="table-cell py-1 px-2">{a.description}</div>
-          </div>
-        ))}
+      <div className="flex justify-center mt-4">
+        <SpellBrigadeAchievementList achievements={sortedAchievements} />
       </div>
     </div>
   );

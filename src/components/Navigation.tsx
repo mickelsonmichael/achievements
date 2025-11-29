@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import useToggle from "@/hooks/useToggle";
 import NavLink from "@/components/NavLink";
+import GameGrid from "@/components/GameGrid";
 import Icon from "@/components/Icon";
 import LoginButton from "@/components/LoginButton";
 import { useLogin } from "@/hooks/LoginContext";
@@ -17,12 +18,17 @@ const Navigation = () => {
     <div className="mb-4 relative">
       <div className="flex flex-col px-2 md:flex-row py-4 bg-white/5">
         <header className="flex items-center">
-          <div className={`mx-3 p-1 flex items-center cursor-pointer rounded ${appDrawerOpen ? "bg-white/10": ""}`} onClick={toggleAppDrawer}>
+          <div
+            className={`mx-3 p-1 flex items-center cursor-pointer rounded ${
+              appDrawerOpen ? "bg-white/10" : ""
+            }`}
+            onClick={toggleAppDrawer}
+          >
             <Icon name="grid" size={2} />
           </div>
 
           <Link href="/">
-            <h1 className="text-xl">Achivement Tracker</h1>
+            <h1 className="text-xl">NotNotMike&apos;s Achievement Tracker</h1>
           </Link>
 
           <div className="ml-auto md:hidden">
@@ -72,16 +78,13 @@ const Navigation = () => {
           Loading achievements
         </div>
       )}
-      <div className={`absolute ${appDrawerOpen ? 'flex' : 'hidden'} content-center top-[120%] left-5 right-5`}>
-        <div className="bg-indigo-900/95 p-3 w-full rounded">
-          <ul>
-            <li>
-              <a href="/games/halo-mcc">Halo: Master Chief Collection</a>
-            </li>
-            <li>
-              <a href="/games/spell-brigade">The Spell Brigade</a>
-            </li>
-          </ul>
+      <div
+        className={`absolute ${
+          appDrawerOpen ? "flex" : "hidden"
+        } content-center top-[120%] left-5 right-5`}
+      >
+        <div className="bg-black/95 p-3 w-full rounded">
+          <GameGrid />
         </div>
       </div>
     </div>

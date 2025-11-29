@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import Icon from "@/components/Icon";
 import UserAchievement from "@/models/UserAchievement";
 
@@ -12,16 +14,25 @@ const HeroAchievements = ({ hero, achievements }: HeroAchievementsProps) => {
   const isFinished = achievements.every((a) => a.unlockedTimestamp != null);
 
   return (
-    <div className="p-2 m-2 bg-white/10 rounded">
+    <div className="p-2 m-2 bg-white/10 rounded flex">
+      <div className="flex flex-col items-center justify-center mr-2">
+        <Image
+          src={`/img/spell-brigade/${hero
+            .toLowerCase()
+            .replaceAll(" ", "-")}.png`}
+          alt={hero}
+          width={133}
+          height={200}
+        />
+        <div className="text-lg">{hero}</div>
+      </div>
+
       {isFinished ? (
-        <div className="text-lg flex items-center">
-          {hero}
-          <Icon name="check" size={2} className="ml-4" />
+        <div className="text-lg flex justify-center items-center flex-grow-1">
+          <Icon name="check" size={6} className="ml-4" />
         </div>
       ) : (
-        <div>
-          <div className="text-lg">{hero}</div>
-
+        <div className="flex-grow-1">
           <ul className="grid gap-1">
             {achievements.map((a) => (
               <li
@@ -35,7 +46,9 @@ const HeroAchievements = ({ hero, achievements }: HeroAchievementsProps) => {
                 />
                 <div>
                   <div>{a.name}</div>
-                  <div className="text-sm">{a.description}</div>
+                  {a.unlockedTimestamp ? null : (
+                    <div className="text-sm">{a.description}</div>
+                  )}
                 </div>
               </li>
             ))}
