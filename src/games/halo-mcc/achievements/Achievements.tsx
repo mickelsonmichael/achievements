@@ -1,3 +1,5 @@
+"use client";
+
 import Filters from "@/games/halo-mcc/achievements/Filters";
 import { AchievementsProvider } from "./AchievementsContext";
 import AchievementsTable from "@/games/halo-mcc/achievements/AchievementsTable";

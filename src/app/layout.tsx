@@ -5,9 +5,9 @@ import Navigation from "@/components/Navigation";
 import { LoginProvider } from "@/hooks/LoginContext";
 
 export const metadata: Metadata = {
-  title: "Halo MCC Collectibles",
+  title: "NotNotMike's Achievement Tracker",
   description:
-    "Site for tracking the Halo Master Chief Collection achievements, skulls, and more.",
+    "Site for tracking the achievements, Halo skulls and terminals, and more.",
 };
 
 type LayoutProps = Readonly<{
