@@ -11,10 +11,15 @@ const games = [
     alt: "The Spell Brigade",
     href: "/games/spell-brigade",
   },
+  {
+    src: "/img/battlefield-6/battlefield-6.jpg",
+    alt: "Battlefield 6",
+    href: "/games/battlefield-6",
+  },
 ];
 
 interface GameGridProps {
-    size?: number;
+  size?: number;
 }
 
 const GameGrid = ({ size = 120 }: GameGridProps) => (

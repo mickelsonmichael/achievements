@@ -8,6 +8,7 @@ import GameGrid from "@/components/GameGrid";
 import Icon from "@/components/Icon";
 import LoginButton from "@/components/LoginButton";
 import { useLogin } from "@/hooks/LoginContext";
+import SquareButton from "./SquareButton";
 
 const Navigation = () => {
   const { isOn: appDrawerOpen, toggle: toggleAppDrawer } = useToggle();
@@ -18,32 +19,26 @@ const Navigation = () => {
     <div className="mb-4 relative">
       <div className="flex flex-col px-2 md:flex-row py-4 bg-white/5">
         <header className="flex items-center">
-          <div
-            className={`mx-3 p-1 flex items-center cursor-pointer rounded hover:bg-black/20 ${
-              appDrawerOpen ? "bg-white/10" : ""
-            }`}
-            onClick={toggleAppDrawer}
-          >
-            <Icon name="grid" size={2} />
+          <div className="mr-2">
+            <SquareButton
+              name="grid"
+              onClick={toggleAppDrawer}
+              isActive={appDrawerOpen}
+              size={2}
+            />
           </div>
 
-          <Link href="/">
+          <Link href="/" className="mr-auto">
             <h1 className="text-xl">NotNotMike&apos;s Achievement Tracker</h1>
           </Link>
 
-          <div className="ml-auto md:hidden">
-            <button
+          <div className="ml-2 md:hidden">
+            <SquareButton
+              name="menu"
               onClick={toggleMenu}
-              className={`
-                rounded-sm
-                border-1
-                border-white/30
-                px-1
-                ${menuOpen ? "bg-white/10" : ""}
-            `}
-            >
-              <Icon name="menu" />
-            </button>
+              isActive={menuOpen}
+              size={2}
+            />
           </div>
         </header>
 
@@ -59,7 +54,7 @@ const Navigation = () => {
             ${menuOpen ? "flex" : "hidden"}
         `}
         >
-          <ul className="flex flex-col gap-1 items-center md:flex-row md:ml-auto">
+          <ul className="flex flex-col gap-1 mt-2 md:items-center md:flex-row md:ml-auto md:mt-auto">
             <LoginButton />
 
             <NavLink
@@ -68,16 +63,19 @@ const Navigation = () => {
               newWindow
             >
               <Icon name="github" />
+              <span className="ml-2 md:hidden md:ml-auto">GitHub</span>
             </NavLink>
           </ul>
         </nav>
       </div>
+
       {isLoading && (
         <div className="bg-cyan-800 py-4 px-8">
           <Icon name="loader" className="mr-4 animate-spin" />
           Loading achievements
         </div>
       )}
+
       <div
         className={`absolute ${
           appDrawerOpen ? "flex" : "hidden"
