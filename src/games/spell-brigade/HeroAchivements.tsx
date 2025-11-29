@@ -11,7 +11,7 @@ interface HeroAchievementsProps {
 }
 
 const HeroAchievements = ({ hero, achievements }: HeroAchievementsProps) => (
-  <div className="p-2 m-2 bg-white/10 rounded md:grid md:grid-cols-4 justify-stretch">
+  <div className="p-2 m-2 bg-zinc-800 rounded md:grid md:grid-cols-4 justify-stretch">
     <div className="flex flex-col items-stretch justify-center mb-2 md:mb-auto md:mr-2">
       <Image
         src={`/img/spell-brigade/${hero

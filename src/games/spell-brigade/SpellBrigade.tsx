@@ -34,13 +34,6 @@ const SpellBrigade = () => {
       {} as Record<string, typeof achievements>
     );
 
-  const sortedAchievements = achievements.sort((a, b) => {
-    const aUnlocked = a.unlockedTimestamp != null ? 1 : 0;
-    const bUnlocked = b.unlockedTimestamp != null ? 1 : 0;
-    if (aUnlocked !== bUnlocked) return aUnlocked - bUnlocked;
-    return a.name.localeCompare(b.name);
-  });
-
   if (!isLoggedIn || isLoggedInWithXbox) {
     return (
       <Info icon="alert-circle">
@@ -62,8 +55,8 @@ const SpellBrigade = () => {
         ))}
       </div>
 
-      <div className="flex justify-center mt-4">
-        <SpellBrigadeAchievementList achievements={sortedAchievements} />
+      <div className="mt-4 mx-2">
+        <SpellBrigadeAchievementList achievements={achievements} />
       </div>
     </div>
   );
