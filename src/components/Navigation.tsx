@@ -19,7 +19,7 @@ const Navigation = () => {
       <div className="flex flex-col px-2 md:flex-row py-4 bg-white/5">
         <header className="flex items-center">
           <div
-            className={`mx-3 p-1 flex items-center cursor-pointer rounded ${
+            className={`mx-3 p-1 flex items-center cursor-pointer rounded hover:bg-black/20 ${
               appDrawerOpen ? "bg-white/10" : ""
             }`}
             onClick={toggleAppDrawer}
