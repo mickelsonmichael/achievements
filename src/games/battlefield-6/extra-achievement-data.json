@@ -1,0 +1,303 @@
+[
+    {
+        "name": "A Joyful Nurse",
+        "description": "Revive 1996 players as Support in Multiplayer",
+        "secret": false
+    },
+    {
+        "name": "Army of Two",
+        "description": "Win 7 matches in Battle Royale: Duos",
+        "category": "redsec",
+        "secret": true
+    },
+    {
+        "name": "Heavy Weaponry",
+        "description": "Get 5 kills with LMGs without reloading in Multiplayer",
+        "secret": false
+    },
+    {
+        "name": "May the Odds Forever Be in Your Favor",
+        "description": "Play 74 matches of any version of Battle Royale",
+        "category": "redsec",
+        "secret": true
+    },
+    {
+        "name": "Mission Accepted",
+        "description": "Complete 214 missions in any version of Battle Royale",
+        "category": "redsec",
+        "secret": true
+    },
+    {
+        "name": "Never-Ending Game",
+        "description": "Play 125 rounds of Gauntlet",
+        "category": "redsec",
+        "secret": true
+    },
+    {
+        "name": "Rise from Your Grave",
+        "description": "Revive teammates 1988 times in Battle Royale or Gauntlet",
+        "category": "redsec",
+        "secret": true
+    },
+    {
+        "name": "Sidearm Savant",
+        "description": "Complete Night Raid using only pistols, knives, or gadgets",
+        "category": "campaign",
+        "secret": true
+    },
+    {
+        "name": "Stone Cold",
+        "description": "Stun enemies 316 times in Battle Royale or Gauntlet",
+        "category": "redsec",
+        "secret": true
+    },
+    {
+        "name": "1200",
+        "description": "Get 6 sidearm headshot kills in a Multiplayer match",
+        "secret": false
+    },
+    {
+        "name": "A Little C-4 Knocking on Your Door",
+        "description": "Deal 2000 damage to enemy vehicles with the Demolition Charge",
+        "secret": false
+    },
+    {
+        "name": "Armor Annihilation",
+        "description": "Destroy 10 enemy vehicles in Single Player",
+        "category": "campaign",
+        "secret": false
+    },
+    {
+        "name": "Being Watched",
+        "description": "Spot a total of 20 enemies with your drone in Operation Ember Strike",
+        "category": "campaign",
+        "secret": true
+    },
+    {
+        "name": "Bullseye Blitz",
+        "description": "Land six consecutive headshots in Moving Mountains",
+        "category": "campaign",
+        "secret": true
+    },
+    {
+        "name": "Cloak and Dagger",
+        "description": "Complete the Battlefield 6 Campaign",
+        "category": "campaign",
+        "secret": false
+    },
+    {
+        "name": "Collector",
+        "description": "Loot 10 Superior or Unique items",
+        "category": "redsec",
+        "secret": true
+    },
+    {
+        "name": "Command and Conquest 2",
+        "description": "Capture 128 objectives in Conquest",
+        "secret": false
+    },
+    {
+        "name": "Damned If You Do",
+        "description": "Complete Operation Ember Strike",
+        "category": "campaign",
+        "secret": false
+    },
+    {
+        "name": "Deep-Six",
+        "description": "Destroy 3 floating mines in Operation Gladius",
+        "category": "campaign",
+        "secret": true
+    },
+    {
+        "name": "Devil in the Dark",
+        "description": "Complete Night Raid",
+        "category": "campaign",
+        "secret": false
+    },
+    {
+        "name": "Dog of War",
+        "description": "Collect 9 Dog Tags in Battle Royale or Gauntlet",
+        "category": "redsec",
+        "secret": true
+    },
+    {
+        "name": "Dogs of War",
+        "description": "Pick up 5 Campaign collectibles",
+        "category": "campaign",
+        "secret": false
+    },
+    {
+        "name": "Efficiency",
+        "description": "Destroy 10 mannequins in The Rock",
+        "category": "campaign",
+        "secret": true
+    },
+    {
+        "name": "End of an Era",
+        "description": "Find the dinosaur figurine in the NATO base in Always Faithful",
+        "category": "campaign",
+        "secret": true
+    },
+    {
+        "name": "Everybody Fights, Nobody Quits",
+        "description": "Win a Battle Royale match as a full squad with all members alive at victory",
+        "category": "redsec",
+        "secret": true
+    },
+    {
+        "name": "First Blood 2",
+        "description": "Perform 10 takedowns in a Multiplayer match",
+        "secret": false
+    },
+    {
+        "name": "Five by Five",
+        "description": "Get 5 multi-kills as Assault in Multiplayer",
+        "secret": false
+    },
+    {
+        "name": "Front line ",
+        "description": "Take or Defend 41 sectors in Breakthrough",
+        "secret": false
+    },
+    {
+        "name": "Here's Your Birthday Present ",
+        "description": "Deploy 42 call-ins",
+        "category": "redsec",
+        "secret": true
+    },
+    {
+        "name": "High Roller",
+        "description": "Complete Nile Guard",
+        "category": "campaign",
+        "secret": false
+    },
+    {
+        "name": "Hounds of War",
+        "description": "Pick up 10 Campaign collectibles",
+        "category": "campaign",
+        "secret": false
+    },
+    {
+        "name": "In Memoriam",
+        "description": "Pick up a Campaign collectible",
+        "category": "campaign",
+        "secret": false
+    },
+    {
+        "name": "Lance Corporal Matkovic",
+        "description": "Reach Rank 14",
+        "secret": false
+    },
+    {
+        "name": "Liquidator",
+        "description": "Headshot kill 50 Enemies in the Campaign.",
+        "category": "campaign",
+        "secret": false
+    },
+    {
+        "name": "Looks Like A Nail",
+        "description": "Kill five enemies with a sledgehammer in No Sleep",
+        "category": "campaign",
+        "secret": true
+    },
+    {
+        "name": "Medal of Honor",
+        "description": "Commit 414 acts of valor in Multiplayer",
+        "secret": false
+    },
+    {
+        "name": "Mozambique Here!",
+        "description": "Ping a Shotgun in Battle Royale",
+        "category": "redsec",
+        "secret": true
+    },
+    {
+        "name": "No Reinforcements",
+        "description": "Shoot down the reinforcement chopper with a tank during Always Forward",
+        "category": "campaign",
+        "secret": true
+    },
+    {
+        "name": "One Stone",
+        "description": "Eliminate 3 enemies with a single grenade in Single Player",
+        "category": "campaign",
+        "secret": false
+    },
+    {
+        "name": "Pack Leader",
+        "description": "Pick up all Campaign collectibles",
+        "category": "campaign",
+        "secret": false
+    },
+    {
+        "name": "Peak Performance",
+        "description": "Complete a Single Player mission on the hardest difficulty",
+        "category": "campaign",
+        "secret": false
+    },
+    {
+        "name": "Private First Class Montes",
+        "description": "Reach Rank 9",
+        "secret": false
+    },
+    {
+        "name": "Punished",
+        "description": "Get 129 kills in Multiplayer.",
+        "secret": false
+    },
+    {
+        "name": "Road Rash",
+        "description": "Get a Roadkill with vehicles in Multiplayer",
+        "secret": false
+    },
+    {
+        "name": "Roadside Assistance",
+        "description": "Collapse an overpass on a tank in Nile Guard",
+        "category": "campaign",
+        "secret": true
+    },
+    {
+        "name": "Rock of Gibraltar",
+        "description": "Complete The Rock and Operation Gladius",
+        "category": "campaign",
+        "secret": false
+    },
+    {
+        "name": "Secret Service",
+        "description": "Complete No Sleep and Moving Mountains",
+        "category": "campaign",
+        "secret": false
+    },
+    {
+        "name": "Sergeant Redford",
+        "description": "Reach Rank 25",
+        "secret": false
+    },
+    {
+        "name": "Stand Alone",
+        "description": "Complete Always Faithful",
+        "category": "campaign",
+        "secret": false
+    },
+    {
+        "name": "Stolz der Nation",
+        "description": "Get 250 sniper rifle kills as Recon in Multiplayer",
+        "secret": false
+    },
+    {
+        "name": "Super Bomb man",
+        "description": "Arm or disarm 5 M-COM explosives in a Multiplayer match",
+        "secret": false
+    },
+    {
+        "name": "Wolves of War",
+        "description": "Pick up 20 Campaign collectibles",
+        "category": "campaign",
+        "secret": false
+    },
+    {
+        "name": "Wrench Monkey",
+        "description": "Repair vehicles for 2042 damage in Multiplayer",
+        "secret": false
+    }
+]

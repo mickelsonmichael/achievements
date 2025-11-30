@@ -5,9 +5,14 @@ import { Metadata } from "next";
 
 import { useLogin } from "@/hooks/LoginContext";
 import useAchievements from "@/hooks/useAchievements";
-import SecretAchievements from "./secret-achievements.json";
+import SecretAchievements from "./extra-achievement-data.json";
 import Icon from "@/components/Icon";
 import Info from "@/components/Info";
+
+const CATEGORY_COLOR = new Map<string, string>([
+  ["redsec", "text-red-700"],
+  ["campaign", "text-amber-700"],
+]);
 
 export const metadata: Metadata = {
   title: "Battlefield 6",
@@ -29,10 +34,13 @@ const Battlefield6 = () => {
 
   const modifiedAchievements = achievements
     .map((a) => {
-      const secretDetails = SecretAchievements.find((s) => s.name === a.name);
-      return secretDetails
-        ? { ...a, secret: true, description: secretDetails.description }
-        : { ...a, secret: false };
+      const details = SecretAchievements.find((s) => s.name === a.name);
+      return {
+        ...a,
+        secret: details?.secret || false,
+        description: details?.description,
+        category: details?.category,
+      };
     })
     .filter(
       (a) =>
@@ -49,6 +57,11 @@ const Battlefield6 = () => {
 
   return (
     <div>
+      <div className="text-right mx-2">
+        {modifiedAchievements.filter((a) => a.unlockedTimestamp == null).length}{" "}
+        of {modifiedAchievements.length} achievement(s) remaining
+      </div>
+
       <div className="m-2 flex items-center">
         <div className="bg-zinc-700 flex rounded items-center flex-grow-1">
           <Icon name="search" className="mx-2 text-zinc-300" />
@@ -74,14 +87,25 @@ const Battlefield6 = () => {
               size={2}
               className="mr-4"
             />
-            <div className="mr-auto">
-              <div>{a.name}</div>
+            <div className="flex-grow-1">
+              <div className="flex items-start">
+                <span className="mr-auto">{a.name}</span>
+                {a.secret && (
+                  <span className="flex items-center p-0 px-2 m-0 ml-1 rounded-xl border-1 text-cyan-600 text-xs">
+                    SECRET
+                  </span>
+                )}
+                {a.category && (
+                  <span
+                    className={`flex items-center p-0 px-2 m-0 ml-1 rounded-xl border-1 ${CATEGORY_COLOR.get(
+                      a.category.toLowerCase()
+                    )} text-xs`}
+                  >
+                    {a.category.toUpperCase()}
+                  </span>
+                )}
+              </div>
               <div className="text-sm">{a.description}</div>
-            </div>
-            <div>
-              {a.secret && (
-                <Icon name="help-circle" className="text-black/30" />
-              )}
             </div>
           </li>
         ))}
