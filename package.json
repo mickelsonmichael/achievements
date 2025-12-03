@@ -13,7 +13,7 @@
     "@types/openid": "^2.0.5",
     "feather-icons": "^4.29.2",
     "js-cookie": "^3.0.5",
-    "next": "15.3.3",
+    "next": "15.4.8",
     "openid": "^2.0.13",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
