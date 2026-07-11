@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Metadata } from "next";
 
 import { useLogin } from "@/hooks/LoginContext";
 import useAchievements from "@/hooks/useAchievements";
@@ -14,10 +13,6 @@ const CATEGORY_COLOR = new Map<string, string>([
   ["campaign", "text-amber-700"],
 ]);
 
-export const metadata: Metadata = {
-  title: "Battlefield 6",
-};
-
 const Battlefield6 = () => {
   const { steamId, isLoggedIn, isLoggedInWithXbox } = useLogin();
   const { achievements } = useAchievements(steamId, "2807960");
@@ -26,7 +21,7 @@ const Battlefield6 = () => {
   if (!isLoggedIn || isLoggedInWithXbox) {
     return (
       <Info icon="alert-circle">
-        You must be logged in with Steam to track <em>The Spell Brigade</em>{" "}
+        You must be logged in with Steam to track <em>Battlefield 6</em>{" "}
         achievements.
       </Info>
     );
