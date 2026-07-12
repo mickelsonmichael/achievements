@@ -53,7 +53,18 @@ const fetchSteamAchievements = async (steamId: string, gameId: string) => {
         return NextResponse.json({ achievements: [] });
     }
 
-    const steamAchievements: SteamAchievementsResponse = await response.json();
+    // Steam returns 200 with an HTML/plain-text body on some failures (rate
+    // limiting, bad key), so `response.ok` alone isn't enough to guarantee
+    // JSON — parse defensively and log the raw body when it isn't.
+    const responseText = await response.text();
+    let steamAchievements: SteamAchievementsResponse;
+    try {
+        steamAchievements = JSON.parse(responseText);
+    } catch (error) {
+        console.warn("Steam returned a non-JSON achievements response: ", responseText.slice(0, 500), error);
+
+        return NextResponse.json({ achievements: [] });
+    }
 
     if (!steamAchievements.playerstats.success) {
         console.warn("Unable to fetch user achievements: ", steamAchievements);

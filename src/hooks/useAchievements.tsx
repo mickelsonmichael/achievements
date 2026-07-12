@@ -19,6 +19,11 @@ const useAchievements = (userId?: string | null, gameId?: string) => {
       .then((data) => {
         setAchievements(data.achievements);
         setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error("Failed to load achievements: ", error);
+        setAchievements([]);
+        setIsLoading(false);
       });
   }, [userId]);
 

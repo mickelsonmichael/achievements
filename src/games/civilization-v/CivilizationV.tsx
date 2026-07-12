@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 
 import { useLogin } from "@/hooks/LoginContext";
@@ -8,6 +8,7 @@ import useAchievements from "@/hooks/useAchievements";
 import useToggle from "@/hooks/useToggle";
 import type UserAchievement from "@/models/UserAchievement";
 import CategoryData from "./achievements.json";
+import FilterDropdown from "./FilterDropdown";
 import Icon from "@/components/Icon";
 import Info from "@/components/Info";
 import Modal from "@/components/Modal";
@@ -100,46 +101,93 @@ interface PlaythroughCivilizationPick {
 
 interface Playthrough {
   civilization: PlaythroughCivilizationPick | null;
-  policy: PlaythroughPick | null;
-  policyCompleted: boolean;
   victory: PlaythroughPick | null;
   victoryCompleted: boolean;
   scenario: PlaythroughPick | null;
+  map: PlaythroughPick | null;
   bonusObjectives: PlaythroughBonusPick[];
+  bonusObjectivesCompleted: boolean;
 }
 
-// Categories with their own dedicated slot above — everything else (map,
-// difficulty, wonder, religion, espionage, diplomacy, trade, gameplay) is
-// fair game for a bonus objective.
-const BONUS_OBJECTIVE_EXCLUDED_CATEGORIES = new Set([
-  "leader",
-  "civ-unique",
+// The pool "bonus objectives" are drawn from. Policy no longer gets its own
+// dedicated slot — it's just one more category in the shared pool. Map,
+// victory and scenario get their own slots above, and leader/civ-unique are
+// always civilization-specific, so none of those belong here.
+const BONUS_OBJECTIVE_CATEGORIES = new Set([
   "policy",
-  "victory",
-  "scenario",
+  "wonder",
+  "religion",
+  "espionage",
+  "diplomacy",
+  "trade",
 ]);
-const BONUS_OBJECTIVE_COUNT = 3;
+const BONUS_OBJECTIVE_COUNT = 2;
 
 function pickRandom<T>(items: T[]): T | null {
   if (items.length === 0) return null;
   return items[Math.floor(Math.random() * items.length)];
 }
 
-function pickRandomN<T>(items: T[], count: number): T[] {
+// Picking two achievements from the same category is the easiest way for
+// "bonus objectives" to end up nudging a playthrough in two directions at
+// once (e.g. two Trade goals competing for the same caravan routes).
+// Spreading picks across distinct categories whenever the pool allows it is
+// a cheap, data-agnostic way to keep the pair from working against itself.
+function pickDiverseN<T extends { category?: string }>(
+  items: T[],
+  count: number
+): T[] {
   const pool = [...items];
   const picks: T[] = [];
   while (pool.length > 0 && picks.length < count) {
-    const index = Math.floor(Math.random() * pool.length);
-    picks.push(pool.splice(index, 1)[0]);
+    const usedCategories = new Set(picks.map((p) => p.category));
+    const candidates = pool.filter((p) => !usedCategories.has(p.category));
+    const source = candidates.length > 0 ? candidates : pool;
+    const chosen = source[Math.floor(Math.random() * source.length)];
+    picks.push(chosen);
+    pool.splice(pool.indexOf(chosen), 1);
   }
   return picks;
 }
 
-// Builds a random Civilization V playthrough goal: a civilization, a policy
-// focus, and a victory type are always suggested (falling back to a fully
-// random pick, flagged as "completed", once every achievement in that
-// category is already unlocked), while a scenario is only suggested "if any"
-// scenario achievement is still locked.
+// Bonus objectives are always civilization-agnostic — anything tied to a
+// civilization already lives under that civilization's own slot, so pulling
+// it in here too would just duplicate an objective under two names. `exclude`
+// additionally keeps a reroll from handing back the exact same pair.
+function pickBonusObjectives(
+  joined: JoinedAchievement[],
+  exclude: Set<string> = new Set()
+): { picks: PlaythroughBonusPick[]; completed: boolean } {
+  const eligible = (a: JoinedAchievement) =>
+    !!a.category &&
+    BONUS_OBJECTIVE_CATEGORIES.has(a.category) &&
+    !a.civilization &&
+    !exclude.has(a.name);
+
+  const lockedPool = joined.filter(
+    (a) => a.unlockedTimestamp == null && eligible(a)
+  );
+  const completed = lockedPool.length === 0;
+  const pool = completed ? joined.filter(eligible) : lockedPool;
+
+  return {
+    completed,
+    picks: pickDiverseN(pool, BONUS_OBJECTIVE_COUNT).map((a) => ({
+      name: a.name,
+      description: a.description,
+      wikiUrl: a.wikiUrl,
+      category: a.category!,
+    })),
+  };
+}
+
+// Builds a random Civilization V playthrough goal. A civilization is chosen
+// first, then its victory condition — preferring an achievement tied to that
+// civilization and only falling back to the shared pool once the civ has
+// nothing left to offer, and never reaching into another civilization's
+// achievements. Map and scenario are only suggested while something in that
+// category is still locked; bonus objectives are always civ-agnostic and
+// picked last so they never re-list something already promised above.
 const generatePlaythrough = (joined: JoinedAchievement[]): Playthrough => {
   const locked = joined.filter((a) => a.unlockedTimestamp == null);
 
@@ -155,44 +203,21 @@ const generatePlaythrough = (joined: JoinedAchievement[]): Playthrough => {
   const chosenCivName = pickRandom(
     civilizationCompleted ? CIVILIZATIONS : openCivilizations
   );
-  const civilization: PlaythroughCivilizationPick | null = chosenCivName
-    ? {
-        name: chosenCivName,
-        completed: civilizationCompleted,
-        achievements: lockedCivAchievements
-          .filter((a) => a.civilization === chosenCivName)
-          .map((a) => ({
-            name: a.name,
-            description: a.description,
-            wikiUrl: a.wikiUrl,
-            category: a.category!,
-          })),
-      }
-    : null;
 
-  const lockedPolicy = locked.filter((a) => a.category === "policy");
-  const policyCompleted = lockedPolicy.length === 0;
-  const policyPool = policyCompleted
-    ? joined.filter((a) => a.category === "policy")
-    : lockedPolicy;
-  const policyPick = pickRandom(policyPool);
-  const policy: PlaythroughPick | null = policyPick
-    ? {
-        name: policyPick.name,
-        description: policyPick.description,
-        wikiUrl: policyPick.wikiUrl,
-      }
-    : null;
-
-  // Victory/scenario achievements tied to a civilization other than the one
-  // just chosen are never eligible — only civ-agnostic ones and ones for
-  // this specific civilization are.
   const isForChosenCiv = (a: JoinedAchievement) =>
     !a.civilization || a.civilization === chosenCivName;
 
-  const lockedVictory = locked.filter(
-    (a) => a.category === "victory" && isForChosenCiv(a)
+  // Victory: civ-specific achievements go first, the shared/civ-agnostic
+  // pool is the fallback, and anything tied to a different civilization is
+  // never a candidate at either step.
+  const lockedVictoryForCiv = locked.filter(
+    (a) => a.category === "victory" && a.civilization === chosenCivName
   );
+  const lockedVictoryShared = locked.filter(
+    (a) => a.category === "victory" && !a.civilization
+  );
+  const lockedVictory =
+    lockedVictoryForCiv.length > 0 ? lockedVictoryForCiv : lockedVictoryShared;
   const victoryCompleted = lockedVictory.length === 0;
   const victoryPool = victoryCompleted
     ? joined.filter((a) => a.category === "victory" && isForChosenCiv(a))
@@ -218,35 +243,69 @@ const generatePlaythrough = (joined: JoinedAchievement[]): Playthrough => {
       }
     : null;
 
-  // Bonus objectives are civilization-agnostic flavor goals — anything tied
-  // to the chosen civilization is already listed in full under its own slot
-  // above, and anything tied to a *different* civilization is never eligible
-  // here.
-  const genericBonusPool = locked.filter(
-    (a) =>
-      !a.civilization &&
-      a.category &&
-      !BONUS_OBJECTIVE_EXCLUDED_CATEGORIES.has(a.category)
+  // Map achievements carry no civilization tag at all — only suggest one
+  // while at least one is still locked, otherwise leave the slot off the
+  // card entirely rather than pad it with an already-unlocked achievement.
+  const lockedMap = locked.filter((a) => a.category === "map");
+  const mapPick = pickRandom(lockedMap);
+  const map: PlaythroughPick | null = mapPick
+    ? {
+        name: mapPick.name,
+        description: mapPick.description,
+        wikiUrl: mapPick.wikiUrl,
+      }
+    : null;
+
+  // A civ-specific victory or scenario achievement is drawn from the same
+  // pool that feeds the civilization card below it — drop it there so it
+  // isn't listed twice under two different headings.
+  const usedNames = new Set(
+    [victoryPick?.name, scenarioPick?.name].filter(
+      (n): n is string => n != null
+    )
   );
-  const bonusObjectives: PlaythroughBonusPick[] = pickRandomN(
-    genericBonusPool,
-    BONUS_OBJECTIVE_COUNT
-  ).map((a) => ({
-    name: a.name,
-    description: a.description,
-    wikiUrl: a.wikiUrl,
-    category: a.category!,
-  }));
+  const civilization: PlaythroughCivilizationPick | null = chosenCivName
+    ? {
+        name: chosenCivName,
+        completed: civilizationCompleted,
+        achievements: lockedCivAchievements
+          .filter(
+            (a) => a.civilization === chosenCivName && !usedNames.has(a.name)
+          )
+          .map((a) => ({
+            name: a.name,
+            description: a.description,
+            wikiUrl: a.wikiUrl,
+            category: a.category!,
+          })),
+      }
+    : null;
+
+  const { picks: bonusObjectives, completed: bonusObjectivesCompleted } =
+    pickBonusObjectives(joined);
 
   return {
     civilization,
-    policy,
-    policyCompleted,
     victory,
     victoryCompleted,
     scenario,
+    map,
     bonusObjectives,
+    bonusObjectivesCompleted,
   };
+};
+
+// Regenerates only the bonus objectives, leaving the civilization, victory,
+// scenario and map choices untouched. Excluding the current pair biases the
+// reroll toward a genuinely different pair instead of just shuffling in
+// place.
+const rerollBonusObjectives = (
+  current: Playthrough,
+  joined: JoinedAchievement[]
+): Playthrough => {
+  const exclude = new Set(current.bonusObjectives.map((b) => b.name));
+  const { picks, completed } = pickBonusObjectives(joined, exclude);
+  return { ...current, bonusObjectives: picks, bonusObjectivesCompleted: completed };
 };
 
 // In-game civilization emblems, sourced from the Civ Fandom wiki
@@ -260,171 +319,6 @@ const BADGE_CLASS =
   "inline-flex items-center gap-1 h-5 px-1.5 rounded-sm border-1 border-zinc-700 bg-zinc-800 text-[10px] uppercase tracking-wide font-medium shrink-0";
 const CIV_ICON_WRAP_CLASS =
   "shrink-0 h-5 w-5 flex items-center justify-center rounded-full border-1 border-zinc-700 bg-zinc-800 overflow-hidden";
-
-const CivilizationDropdown = ({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-}) => {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const onClickOutside = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", onClickOutside);
-    return () => document.removeEventListener("mousedown", onClickOutside);
-  }, [open]);
-
-  return (
-    <div className="relative" ref={ref}>
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="bg-zinc-800 border-1 border-amber-800/30 rounded flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer min-w-40"
-      >
-        {value ? (
-          <span className={CIV_ICON_WRAP_CLASS}>
-            <Image src={civIconSrc(value)} alt={value} width={20} height={20} />
-          </span>
-        ) : (
-          <Icon name="globe" size={1} className="text-zinc-400 shrink-0" />
-        )}
-        <span className="mr-auto truncate">{value || "All Civilizations"}</span>
-        <Icon
-          name="chevron-down"
-          size={1}
-          className={`text-zinc-400 shrink-0 transition-transform ${
-            open ? "rotate-180" : ""
-          }`}
-        />
-      </button>
-
-      {open && (
-        <ul className="absolute z-10 mt-1 max-h-72 w-56 overflow-y-auto rounded border-1 border-amber-800/40 bg-zinc-900 py-1">
-          <li>
-            <button
-              type="button"
-              onClick={() => {
-                onChange("");
-                setOpen(false);
-              }}
-              className={`w-full text-left flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer hover:bg-zinc-800 ${
-                value === "" ? "text-amber-400" : ""
-              }`}
-            >
-              <Icon name="globe" size={1} className="shrink-0" />
-              All Civilizations
-            </button>
-          </li>
-          {CIVILIZATIONS.map((c) => (
-            <li key={c}>
-              <button
-                type="button"
-                onClick={() => {
-                  onChange(c);
-                  setOpen(false);
-                }}
-                className={`w-full text-left flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer hover:bg-zinc-800 ${
-                  value === c ? "text-amber-400" : ""
-                }`}
-              >
-                <span className={CIV_ICON_WRAP_CLASS}>
-                  <Image src={civIconSrc(c)} alt="" width={20} height={20} />
-                </span>
-                {c}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-};
-
-const DlcDropdown = ({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-}) => {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const onClickOutside = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", onClickOutside);
-    return () => document.removeEventListener("mousedown", onClickOutside);
-  }, [open]);
-
-  return (
-    <div className="relative" ref={ref}>
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="bg-zinc-800 border-1 border-amber-800/30 rounded flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer min-w-40"
-      >
-        <Icon name="package" size={1} className="text-zinc-400 shrink-0" />
-        <span className="mr-auto truncate">{value || "All DLC"}</span>
-        <Icon
-          name="chevron-down"
-          size={1}
-          className={`text-zinc-400 shrink-0 transition-transform ${
-            open ? "rotate-180" : ""
-          }`}
-        />
-      </button>
-
-      {open && (
-        <ul className="absolute z-10 mt-1 max-h-72 w-56 overflow-y-auto rounded border-1 border-amber-800/40 bg-zinc-900 py-1">
-          <li>
-            <button
-              type="button"
-              onClick={() => {
-                onChange("");
-                setOpen(false);
-              }}
-              className={`w-full text-left flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer hover:bg-zinc-800 ${
-                value === "" ? "text-amber-400" : ""
-              }`}
-            >
-              <Icon name="package" size={1} className="shrink-0" />
-              All DLC
-            </button>
-          </li>
-          {DLC_PACKS.map((d) => (
-            <li key={d}>
-              <button
-                type="button"
-                onClick={() => {
-                  onChange(d);
-                  setOpen(false);
-                }}
-                className={`w-full text-left flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer hover:bg-zinc-800 ${
-                  value === d ? "text-amber-400" : ""
-                }`}
-              >
-                {d}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-};
 
 const WikiLink = ({ url }: { url: string }) => (
   <a
@@ -442,25 +336,36 @@ const PlaythroughSlot = ({
   label,
   icon,
   colorClass,
+  action,
   children,
 }: {
   label: string;
   icon: IconName;
   colorClass: string;
+  action?: React.ReactNode;
   children: React.ReactNode;
 }) => (
   <div className="rounded p-3 flex flex-col gap-1.5 border-1 bg-zinc-900 border-amber-700/40 min-w-0">
-    <div
-      className={`flex items-center gap-1.5 text-xs uppercase tracking-wide font-semibold ${colorClass}`}
-    >
-      <Icon name={icon} style={{ width: 12, height: 12 }} />
-      {label}
+    <div className="flex items-center gap-1.5">
+      <div
+        className={`flex items-center gap-1.5 text-xs uppercase tracking-wide font-semibold ${colorClass}`}
+      >
+        <Icon name={icon} style={{ width: 12, height: 12 }} />
+        {label}
+      </div>
+      {action && <div className="ml-auto">{action}</div>}
     </div>
     {children}
   </div>
 );
 
-const PlaythroughCard = ({ suggestion }: { suggestion: Playthrough }) => (
+const PlaythroughCard = ({
+  suggestion,
+  onRerollBonusObjectives,
+}: {
+  suggestion: Playthrough;
+  onRerollBonusObjectives: () => void;
+}) => (
   <div className="flex flex-col gap-1.5">
     {suggestion.civilization && (
       <PlaythroughSlot
@@ -512,35 +417,6 @@ const PlaythroughCard = ({ suggestion }: { suggestion: Playthrough }) => (
     )}
 
     <PlaythroughSlot
-      label="Policy Focus"
-      icon={CATEGORY_ICON.get("policy")!}
-      colorClass={CATEGORY_COLOR.get("policy")!}
-    >
-      {suggestion.policy ? (
-        <>
-          <div className="flex items-center gap-1.5">
-            <span className="text-sm">{suggestion.policy.name}</span>
-            {suggestion.policy.wikiUrl && (
-              <WikiLink url={suggestion.policy.wikiUrl} />
-            )}
-          </div>
-          {suggestion.policy.description && (
-            <p className="text-xs text-zinc-400 line-clamp-3">
-              {suggestion.policy.description}
-            </p>
-          )}
-          {suggestion.policyCompleted && (
-            <p className="text-xs text-zinc-500 italic">
-              Already unlocked — picked at random.
-            </p>
-          )}
-        </>
-      ) : (
-        <p className="text-xs text-zinc-500 italic">No policy data found.</p>
-      )}
-    </PlaythroughSlot>
-
-    <PlaythroughSlot
       label="Victory Condition"
       icon={CATEGORY_ICON.get("victory")!}
       colorClass={CATEGORY_COLOR.get("victory")!}
@@ -589,8 +465,47 @@ const PlaythroughCard = ({ suggestion }: { suggestion: Playthrough }) => (
       </PlaythroughSlot>
     )}
 
+    {suggestion.map && (
+      <PlaythroughSlot
+        label="Map"
+        icon={CATEGORY_ICON.get("map")!}
+        colorClass={CATEGORY_COLOR.get("map")!}
+      >
+        <div className="flex items-center gap-1.5">
+          <span className="text-sm">{suggestion.map.name}</span>
+          {suggestion.map.wikiUrl && <WikiLink url={suggestion.map.wikiUrl} />}
+        </div>
+        {suggestion.map.description && (
+          <p className="text-xs text-zinc-400 line-clamp-3">
+            {suggestion.map.description}
+          </p>
+        )}
+      </PlaythroughSlot>
+    )}
+
     {suggestion.bonusObjectives.length > 0 && (
-      <PlaythroughSlot label="Bonus Objectives" icon="gift" colorClass="text-zinc-300">
+      <PlaythroughSlot
+        label="Bonus Objectives"
+        icon="gift"
+        colorClass="text-zinc-300"
+        action={
+          <button
+            type="button"
+            onClick={onRerollBonusObjectives}
+            title="Reroll bonus objectives"
+            className="flex items-center gap-1 text-[10px] uppercase tracking-wide text-zinc-500 hover:text-amber-400 cursor-pointer"
+          >
+            <Icon name="shuffle" style={{ width: 11, height: 11 }} />
+            Reroll
+          </button>
+        }
+      >
+        {suggestion.bonusObjectivesCompleted && (
+          <p className="text-xs text-zinc-500 italic">
+            Every eligible achievement is already unlocked — picked at
+            random.
+          </p>
+        )}
         <ul className="flex flex-col gap-2">
           {suggestion.bonusObjectives.map((a) => (
             <li key={a.name} className="flex items-start gap-2">
@@ -699,20 +614,6 @@ const CivilizationV = () => {
         </span>
       </div>
 
-      <div className="m-2 flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => {
-            setPlaythrough(generatePlaythrough(joinedAchievements));
-            openPlaythroughModal();
-          }}
-          className="bg-zinc-800 border-1 border-amber-800/30 hover:border-amber-600/70 rounded flex items-center gap-2 px-3 py-1.5 text-sm cursor-pointer shrink-0"
-        >
-          <Icon name="shuffle" size={1} className="text-amber-500" />
-          Generate Playthrough
-        </button>
-      </div>
-
       <Modal
         isOpen={isPlaythroughModalOpen}
         onToggle={closePlaythroughModal}
@@ -720,17 +621,26 @@ const CivilizationV = () => {
       >
         {playthrough && (
           <div className="flex flex-col gap-2">
-            <PlaythroughCard suggestion={playthrough} />
             <button
               type="button"
               onClick={() =>
                 setPlaythrough(generatePlaythrough(joinedAchievements))
               }
-              className="self-start bg-zinc-800 border-1 border-amber-800/30 hover:border-amber-600/70 rounded flex items-center gap-2 px-3 py-1.5 text-sm cursor-pointer"
+              className="self-end bg-zinc-800 border-1 border-amber-800/30 hover:border-amber-600/70 rounded flex items-center gap-2 px-3 py-1.5 text-sm cursor-pointer"
             >
               <Icon name="shuffle" size={1} className="text-amber-500" />
               Reroll
             </button>
+            <PlaythroughCard
+              suggestion={playthrough}
+              onRerollBonusObjectives={() =>
+                setPlaythrough((current) =>
+                  current
+                    ? rerollBonusObjectives(current, joinedAchievements)
+                    : current
+                )
+              }
+            />
           </div>
         )}
       </Modal>
@@ -745,8 +655,36 @@ const CivilizationV = () => {
             placeholder="Search"
           />
         </div>
-        <CivilizationDropdown value={civilization} onChange={setCivilization} />
-        <DlcDropdown value={dlc} onChange={setDlc} />
+        <FilterDropdown
+          value={civilization}
+          onChange={setCivilization}
+          options={CIVILIZATIONS}
+          placeholder="All Civilizations"
+          icon="globe"
+          renderOptionIcon={(name) => (
+            <span className={CIV_ICON_WRAP_CLASS}>
+              <Image src={civIconSrc(name)} alt="" width={20} height={20} />
+            </span>
+          )}
+        />
+        <FilterDropdown
+          value={dlc}
+          onChange={setDlc}
+          options={DLC_PACKS}
+          placeholder="All DLC"
+          icon="package"
+        />
+        <button
+          type="button"
+          onClick={() => {
+            setPlaythrough(generatePlaythrough(joinedAchievements));
+            openPlaythroughModal();
+          }}
+          className="bg-zinc-800 border-1 border-amber-800/30 hover:border-amber-600/70 rounded flex items-center gap-2 px-3 py-1.5 text-sm cursor-pointer shrink-0"
+        >
+          <Icon name="shuffle" size={1} className="text-amber-500" />
+          Generate Playthrough
+        </button>
       </div>
 
       <div className="mx-2 mb-2 flex flex-wrap gap-1">
