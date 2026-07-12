@@ -16,6 +16,11 @@ const games = [
     alt: "Battlefield 6",
     href: "/games/battlefield-6",
   },
+  {
+    src: "/img/civilization-v/civilization-v.jpg",
+    alt: "Sid Meier's Civilization V",
+    href: "/games/civilization-v",
+  },
 ];
 
 interface GameGridProps {
